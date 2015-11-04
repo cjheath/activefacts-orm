@@ -332,7 +332,7 @@ module ActiveFacts
         facts = []
 
         trace :orm, "Reading sub-types" do
-          @x_subtypes.each{|x|
+          @x_subtypes.each do |x|
             id = x['id']
             name = (x['Name'] || x['_Name'] || '').gsub(/\s+/,' ').gsub(/-/,'_').strip
             name = nil if name.size == 0
@@ -385,7 +385,7 @@ module ActiveFacts
             n = 'aeioh'.include?(subtype_role.object_type.name.downcase[0]) ? 1 : 0
             @constellation.Reading(inheritance_fact, 2+n, :role_sequence => rs2, :text => "{0} is a {1}", :is_negative => false)
             @constellation.Reading(inheritance_fact, 3-n, :role_sequence => rs2, :text => "{0} is an {1}", :is_negative => false)
-          }
+          end
         end
       end
 
@@ -423,10 +423,7 @@ module ActiveFacts
 
       def complete_nested_types
         @nested_types.each do |nested_type|
-          # Create the phantom roles here. These will be used later when we create objectification steps,
-          # but for now there's nothing we import from NORMA which requires objectification steps.
-          # Consequently there's no need to index them against NORMA's phantom roles.
-          nested_type.create_implicit_fact_types
+          nested_type.create_link_fact_types
         end
       end
 
