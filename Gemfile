@@ -2,9 +2,10 @@ source 'https://rubygems.org'
 
 gemspec
 
-if ENV['PWD'] =~ %r{\A#{ENV['HOME']}/work}
-  $stderr.puts "Using work area gems for #{File.basename(File.dirname(__FILE__))} from activefacts-orm"
-  gem 'activefacts-api', path: '/Users/cjh/work/activefacts/api'
-  gem 'activefacts-metamodel', path: '/Users/cjh/work/activefacts/metamodel'
-  # gem 'activefacts-metamodel', git: 'git://github.com/cjheath/activefacts-metamodel.git'
+this_file = File.absolute_path(__FILE__)
+if this_file =~ %r{\A#{ENV['HOME']}}i
+  dir = File.dirname(File.dirname(this_file))
+  $stderr.puts "Using work area gems in #{dir} from activefacts-orm"
+  gem 'activefacts-api', path: dir+'/api'
+  gem 'activefacts-metamodel', path: dir+'/metamodel'
 end

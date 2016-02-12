@@ -961,6 +961,7 @@ module ActiveFacts
 		  query_role = role_ref.role
 
 		  # Make the projected RoleRef:
+		  return role_sequence unless constrained_play	# REVISIT: This is a fail; survive it.
 		  rr = @constellation.RoleRef(replacement_rs, replacement_rs.all_role_ref.size, :role => constrained_play.role, :play => constrained_play)
 		else
 		  # We enter this fact type (requiring that a role be played) but don't exit it.
