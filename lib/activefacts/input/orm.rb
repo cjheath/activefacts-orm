@@ -72,13 +72,13 @@ module ActiveFacts
 
     private
       def self.readfile(filename, *options)
-	if File.basename(filename, '.orm') == "-"
-	  self.read(STDIN, "<standard input>", options)
-	else
-	  File.open(filename) {|file|
-	    self.read(file, filename, *options)
-	  }
-	end
+        if File.basename(filename, '.orm') == "-"
+          self.read(STDIN, "<standard input>", options)
+        else
+          File.open(filename) {|file|
+            self.read(file, filename, *options)
+          }
+        end
       end
 
       def self.read(file, filename = "stdin", *options)
@@ -149,7 +149,7 @@ module ActiveFacts
       end
 
       def id_of(x)
-	x['id'][1..-1]
+        x['id'][1..-1]
       end
 
       def read_entity_types
@@ -160,17 +160,17 @@ module ActiveFacts
           id = x['id']
           name = (x['Name'] || "").gsub(/\s+/,' ').gsub(/-/,'_').strip
           name = nil if name.size == 0
-	  entity_type =
-	    @by_id[id] =
-	      trace :orm, "Asserting new EntityType #{name.inspect}" do
-		@vocabulary.valid_entity_type_name(name) ||
-		@constellation.EntityType(@vocabulary, name, :concept => id_of(x))
-	      end
-	  entity_types << entity_type
-	  independent = x['IsIndependent']
-	  entity_type.is_independent = true if independent && independent == 'true'
-	  personal = x['IsPersonal']
-	  entity_type.pronoun = 'personal' if personal && personal == 'true'
+          entity_type =
+            @by_id[id] =
+              trace :orm, "Asserting new EntityType #{name.inspect}" do
+                @vocabulary.valid_entity_type_name(name) ||
+                @constellation.EntityType(@vocabulary, name, :concept => id_of(x))
+              end
+          entity_types << entity_type
+          independent = x['IsIndependent']
+          entity_type.is_independent = true if independent && independent == 'true'
+          personal = x['IsPersonal']
+          entity_type.pronoun = 'personal' if personal && personal == 'true'
   #       x_pref = x.xpath("orm:PreferredIdentifier")[0]
   #       if x_pref
   #         pi_id = x_pref['ref']
@@ -209,21 +209,21 @@ module ActiveFacts
         type_name.sub!(/^orm:/,'')
 
         type_name.sub!(/DataType\Z/,'')
-	if t = DataTypeMapping[type_name]
-	  existing = @constellation.ObjectType[[@vocabulary.identifying_role_values, t]]
-	  if !existing || existing.is_a?(ActiveFacts::Metamodel::ValueType)
-	    # There's no type conflict, so use the mapped name.
-	    type_name = t
-	  end
-	end
-	trace :orm, "Using #{type_name.inspect} as supertype for new #{name}"
+        if t = DataTypeMapping[type_name]
+          existing = @constellation.ObjectType[[@vocabulary.identifying_role_values, t]]
+          if !existing || existing.is_a?(ActiveFacts::Metamodel::ValueType)
+            # There's no type conflict, so use the mapped name.
+            type_name = t
+          end
+        end
+        trace :orm, "Using #{type_name.inspect} as supertype for new #{name}"
         if !length and type_name =~ /\(([0-9]+)\)/
           length = $1.to_i
         end
         type_name = type_name.sub(/\(([0-9]*)\)/,'')
 
         subtype_roles = x.xpath("orm:PlayedRoles/orm:SubtypeMetaRole")
-	value_super_type = nil
+        value_super_type = nil
         if !subtype_roles.empty?
           subtype_role_id = subtype_roles[0]['ref']
           subtype_role = @x_by_id[subtype_role_id]
@@ -235,30 +235,30 @@ module ActiveFacts
           supertype_name = x_supertype['Name']
           raise "Supertype of #{name} is post-defined but recursiving processing failed" unless supertype
           raise "Supertype #{supertype_name} of #{name} is not a value type" unless supertype.kind_of? ActiveFacts::Metamodel::ValueType
-	  trace :orm, "Asserting new ValueType #{supertype_name.inspect} for supertype" do
-	    value_super_type =
-	      @vocabulary.valid_value_type_name(supertype_name) ||
-	      @constellation.ValueType(@vocabulary, supertype_name, :concept => id_of(x_supertype))
-	  end
+          trace :orm, "Asserting new ValueType #{supertype_name.inspect} for supertype" do
+            value_super_type =
+              @vocabulary.valid_value_type_name(supertype_name) ||
+              @constellation.ValueType(@vocabulary, supertype_name, :concept => id_of(x_supertype))
+          end
         else
           # REVISIT: Need to handle standard types better here:
           value_super_type =
-	    if type_name != name
-	      trace :orm, "Asserting new ValueType #{type_name.inspect} for supertype" do
-		@vocabulary.valid_value_type_name(type_name) ||
-		  @constellation.ValueType(@vocabulary.identifying_role_values, type_name, :concept => :new)
-	      end
-	    else
-	      nil
-	    end
+            if type_name != name
+              trace :orm, "Asserting new ValueType #{type_name.inspect} for supertype" do
+                @vocabulary.valid_value_type_name(type_name) ||
+                  @constellation.ValueType(@vocabulary.identifying_role_values, type_name, :concept => :new)
+              end
+            else
+              nil
+            end
         end
 
-	vt =
-	  trace :orm, "Asserting new ValueType #{name.inspect}" do
-	    @by_id[id] =
-	      @vocabulary.valid_value_type_name(name) ||
-	      @constellation.ValueType(@vocabulary.identifying_role_values, name, :concept => id_of(x))
-	  end
+        vt =
+          trace :orm, "Asserting new ValueType #{name.inspect}" do
+            @by_id[id] =
+              @vocabulary.valid_value_type_name(name) ||
+              @constellation.ValueType(@vocabulary.identifying_role_values, name, :concept => id_of(x))
+          end
         vt.supertype = value_super_type
         vt.length = length if length
         vt.scale = scale if scale && scale != 0
@@ -281,11 +281,11 @@ module ActiveFacts
       end
 
       def assert_value(val, string)
-	if val
-	  @constellation.Value(val.to_s, string, nil)
-	else
-	  nil
-	end
+        if val
+          @constellation.Value(val.to_s, string, nil)
+        else
+          nil
+        end
       end
 
       def value_range(x_range)
@@ -294,9 +294,9 @@ module ActiveFacts
 
         strings = is_literal_string(min) || is_literal_string(max)
         # ValueRange takes a minimum and/or a maximum Bound, each takes value and whether inclusive
-	@constellation.ValueRange(
-	  min.length > 0 ? @constellation.Bound(assert_value(min, strings), true) : nil,
-	  max.length > 0 ? @constellation.Bound(assert_value(max, strings), true) : nil)
+        @constellation.ValueRange(
+          min.length > 0 ? @constellation.Bound(assert_value(min, strings), true) : nil,
+          max.length > 0 ? @constellation.Bound(assert_value(max, strings), true) : nil)
       end
 
       def read_fact_types
@@ -411,8 +411,8 @@ module ActiveFacts
             trace :orm, "NestedType #{name} is #{id}, nests #{fact_type.concept.guid}"
             @nested_types <<
               @by_id[id] =
-		nested_type = @vocabulary.valid_entity_type_name(name) ||
-		  @constellation.EntityType(@vocabulary, name, :concept => id_of(x))
+                nested_type = @vocabulary.valid_entity_type_name(name) ||
+                  @constellation.EntityType(@vocabulary, name, :concept => id_of(x))
             independent = x['IsIndependent']
             nested_type.is_independent = true if independent && independent == 'true' && !is_implied
             nested_type.concept.implication_rule = 'objectification' if is_implied
@@ -474,9 +474,9 @@ module ActiveFacts
                   @by_id.delete(ref)    # and de-index it from our list
                   next
                 end
-		if !object_type
-		  throw "RolePlayer for '#{name}' #{ref} in fact type #{x.parent.parent['_Name']} was not found"
-		end
+                if !object_type
+                  throw "RolePlayer for '#{name}' #{ref} in fact type #{x.parent.parent['_Name']} was not found"
+                end
 
                 trace :orm, "#{@vocabulary.name}, RoleName=#{x['Name'].inspect} played by object_type=#{object_type.name}"
                 throw "Role is played by #{object_type.class} not ObjectType" if !(@constellation.vocabulary.object_type(:ObjectType) === object_type)
@@ -506,7 +506,7 @@ module ActiveFacts
 
             # Deal with Readings:
             trace :orm, "Reading fact readings" do
-	      x_reading_orders = x.xpath('orm:ReadingOrders/*')
+              x_reading_orders = x.xpath('orm:ReadingOrders/*')
               x_reading_orders.each{|x|
                 x_role_sequence = x.xpath('orm:RoleSequence/*')
                 x_readings = x.xpath('orm:Readings/orm:Reading/orm:Data')
@@ -576,7 +576,7 @@ module ActiveFacts
           case w
           when /[A-Za-z]/
             if RESERVED_WORDS.include?(w)
-              $stderr.puts "Masking reserved word '#{w}' in reading '#{text}'"
+              $stderr.puts "Masking reserved word '#{w}' in reading '#{text}' with players #{all_role_refs.map(&:role).map(&:name).inspect}"
               next "_#{w}"
             elsif @constellation.ObjectType[[[@vocabulary.name], w]]
               $stderr.puts "Masking object type name '#{w}' in reading '#{text}'"
@@ -760,13 +760,13 @@ module ActiveFacts
               join_over, = *ActiveFacts::Metamodel.plays_over(role_sequence.all_role_ref.map{|rr| rr.role}, :counterpart)
 
               players = role_sequence.all_role_ref.map{|rr| rr.role.object_type.name}.uniq
-	      unless join_over
-		if x.xpath("orm:RoleSequence/orm:JoinRule").size > 0
-		  $stderr.puts "Ignoring Join #{name} because its query is not understood"
-		  next
-		end
-		raise "Uniqueness join constraint #{name} has incompatible players #{players.inspect}"
-	      end
+              unless join_over
+                if x.xpath("orm:RoleSequence/orm:JoinRule").size > 0
+                  $stderr.puts "Ignoring Join #{name} because its query is not understood"
+                  next
+                end
+                raise "Uniqueness join constraint #{name} has incompatible players #{players.inspect}"
+              end
               subtyping = players.size > 1 ? 'subtyping ' : ''
               # REVISIT: Create the Query, the Variable for join_over, and steps from each role_ref to join_over
               trace :query, "#{subtyping}join uniqueness constraint over #{join_over.name} in #{fact_types.map(&:default_reading)*', '}"
@@ -865,150 +865,150 @@ module ActiveFacts
       end
 
       # If there's a query, build it and return a new RoleSequence containing the projected roles:
-      def query_over_role_sequence(role_sequence, join_over, joined_roles, end_points)
-	# Skip if there's no query here (sequence join nor end-point subset join)
-	role_refs = role_sequence.all_role_ref_in_order
-	if !join_over and !role_refs.detect{|rr| rr.role.object_type != end_points[rr.ordinal]}
-	  # No sequence join nor end_point join here
-	  return role_sequence
-	end
+      def query_over_role_sequence(constraint_desc, role_sequence, join_over, joined_roles, end_points)
+        # Skip if there's no query here (sequence join nor end-point subset join)
+        role_refs = role_sequence.all_role_ref_in_order
+        if !join_over and !role_refs.detect{|rr| rr.role.object_type != end_points[rr.ordinal]}
+          # No sequence join nor end_point join here
+          return role_sequence
+        end
 
-	# A RoleSequence for the actual query end-points
-	replacement_rs = @constellation.RoleSequence(:new)
+        # A RoleSequence for the actual query end-points
+        replacement_rs = @constellation.RoleSequence(:new)
 
-	query = @constellation.Query(:new)
-	variable = nil
-	query_role = nil
-	role_refs.zip(joined_roles||[]).each_with_index do |(role_ref, joined_role), i|
+        query = @constellation.Query(:new)
+        variable = nil
+        query_role = nil
+        role_refs.zip(joined_roles||[]).each_with_index do |(role_ref, joined_role), i|
 
-	  # Each role_ref is to an object joined via joined_role to variable (or which will be the variable)
+          # Each role_ref is to an object joined via joined_role to variable (or which will be the variable)
 
-	  # Create a variable for the actual end-point (supertype of the constrained roles)
-	  end_point = end_points[i]
-	  unless end_point
-	    raise "In #{constraint_type} #{name}, there is a faulty or non-translated query"
-	  end
-	  trace :query, "Variable #{query.all_variable.size} is for #{end_point.name}"
-	  end_node = @constellation.Variable(query, query.all_variable.size, :object_type => end_point)
+          # Create a variable for the actual end-point (supertype of the constrained roles)
+          end_point = end_points[i]
+          unless end_point
+            raise "In #{constraint_desc}, there is a faulty or non-translated query"
+          end
+          trace :query, "Variable #{query.all_variable.size} is for #{end_point.name}"
+          end_node = @constellation.Variable(query, query.all_variable.size, :object_type => end_point)
 
-	  # We're going to rewrite the constraint to constrain the supertype roles, but assume they're the same:
-	  role_node = end_node
-	  end_role = role_ref.role
+          # We're going to rewrite the constraint to constrain the supertype roles, but assume they're the same:
+          role_node = end_node
+          end_role = role_ref.role
 
-	  # Create subtyping steps at the end-point, if needed:
-	  projecting_play = nil
-	  constrained_play = nil
-	  if (subtype = role_ref.role.object_type) != end_point
-	    trace :query, "Making subtyping steps from #{subtype.name} to #{end_point.name}" do
-	      # There may be more than one supertyping level. Make the steps:
-	      subtyping_steps = subtype_steps(query, subtype, end_point)
-	      step = subtyping_steps[0]
-	      #constrained_play = subtyping_steps[-1].all_play.detect{|p| p.role.object_type == end_point}
-	      subtyping_steps.detect{|s| constrained_play = s.all_play.detect{|p| p.role.object_type == end_point}}
+          # Create subtyping steps at the end-point, if needed:
+          projecting_play = nil
+          constrained_play = nil
+          if (subtype = role_ref.role.object_type) != end_point
+            trace :query, "Making subtyping steps from #{subtype.name} to #{end_point.name}" do
+              # There may be more than one supertyping level. Make the steps:
+              subtyping_steps = subtype_steps(query, subtype, end_point)
+              step = subtyping_steps[0]
+              #constrained_play = subtyping_steps[-1].all_play.detect{|p| p.role.object_type == end_point}
+              subtyping_steps.detect{|s| constrained_play = s.all_play.detect{|p| p.role.object_type == end_point}}
 
-	      # Replace the constrained role and node with the supertype ones:
-	      end_node = query.all_variable.detect{|jn| jn.object_type == end_point }
-	      #projecting_play = step.all_play.detect{|p| p.role.object_type == subtype}
-	      subtyping_steps.detect{|s| projecting_play = s.all_play.detect{|p| p.role.object_type == subtype}}
-	      end_role = step.fact_type.all_role.detect{|r| r.object_type == end_point }
-	      role_node = query.all_variable.detect{|jn| jn.object_type == role_ref.role.object_type }
-	    end
-	  end
+              # Replace the constrained role and node with the supertype ones:
+              end_node = query.all_variable.detect{|jn| jn.object_type == end_point }
+              #projecting_play = step.all_play.detect{|p| p.role.object_type == subtype}
+              subtyping_steps.detect{|s| projecting_play = s.all_play.detect{|p| p.role.object_type == subtype}}
+              end_role = step.fact_type.all_role.detect{|r| r.object_type == end_point }
+              role_node = query.all_variable.detect{|jn| jn.object_type == role_ref.role.object_type }
+            end
+          end
 
-	  if end_role.object_type != end_node.object_type
-	    raise "Internal error in #{constraint_type} #{name}: making illegal reference to variable, end role mismatch"
-	  end
+          if end_role.object_type != end_node.object_type
+            raise "Internal error in #{constraint_desc}: making illegal reference to variable, end role mismatch"
+          end
 
-	  if join_over
-	    if !variable     # Create the Variable when processing the first role
-	      trace :query, "Variable #{query.all_variable.size} is over #{join_over.name}"
-	      variable = @constellation.Variable(query, query.all_variable.size, :object_type => join_over)
-	    end
-	    trace :query, "Making step from #{end_point.name} to #{join_over.name}" do
-	      rs = @constellation.RoleSequence(:new)
-	      # Detect the fact type over which we're stepping (may involve objectification)
-	      raise "Internal error in #{constraint_type} #{name}: making illegal reference to variable, object type mismatch" if role_ref.role.object_type != role_node.object_type
-	      step = @constellation.Step(:guid => :new, :fact_type => joined_role.fact_type)
-	      @constellation.RoleRef(rs, 0, :role => role_ref.role)
-	      role_play = @constellation.Play(:step => step, :variable => role_node, :role => role_ref.role, :is_input => true)
-	      # Make the projected RoleRef:
-	      rr = @constellation.RoleRef(replacement_rs, replacement_rs.all_role_ref.size, :role => role_ref.role, :play => role_play)
-	      raise "Internal error in #{constraint_type} #{name}: making illegal reference to variable, joined_role mismatch" if joined_role.object_type != variable.object_type
-	      @constellation.RoleRef(rs, 1, :role => joined_role)
-	      join_play = @constellation.Play(:step => step, :variable => variable, :role => joined_role)
-	      trace :query, "New step #{step.describe}"
-	    end
-	  else
-	    trace :query, "Need step for non-join_over role #{end_point.name} #{role_ref.describe} in #{role_ref.role.fact_type.default_reading}"
-	    if (roles = role_ref.role.fact_type.all_role.to_a).size > 1
-	      # Here we have an end join (step already created) but no sequence join
-	      if variable
-		raise "Internal error in #{constraint_type} #{name}: making illegal step" if role_ref.role.object_type != role_node.object_type
-		step = @constellation.Step(:guid => :new, :fact_type => role_ref.role.fact_type)
-		join_play = @constellation.Play(:step => step, :variable => variable, :role => query_role, :is_input => true)
-		role_play = @constellation.Play(:step => step, :variable => role_node, :role => role_ref.role)
-		# Make the projected RoleRef:
-		rr = @constellation.RoleRef(replacement_rs, replacement_rs.all_role_ref.size, :role => role_ref.role, :play => role_play)
-		roles -= [query_role, role_ref.role]
-		roles.each do |incidental_role|
-		  jn = @constellation.Variable(query, query.all_variable.size, :object_type => incidental_role.object_type)
-		  play = @constellation.Play(:step => step, :variable => jn, :role => incidental_role, :step => step)
-		end
-	      else
+          if join_over
+            if !variable     # Create the Variable when processing the first role
+              trace :query, "Variable #{query.all_variable.size} is over #{join_over.name}"
+              variable = @constellation.Variable(query, query.all_variable.size, :object_type => join_over)
+            end
+            trace :query, "Making step from #{end_point.name} to #{join_over.name}" do
+              rs = @constellation.RoleSequence(:new)
+              # Detect the fact type over which we're stepping (may involve objectification)
+              raise "Internal error in #{constraint_desc}: making illegal reference to variable, object type mismatch" if role_ref.role.object_type != role_node.object_type
+              step = @constellation.Step(:guid => :new, :fact_type => joined_role.fact_type)
+              @constellation.RoleRef(rs, 0, :role => role_ref.role)
+              role_play = @constellation.Play(:step => step, :variable => role_node, :role => role_ref.role, :is_input => true)
+              # Make the projected RoleRef:
+              rr = @constellation.RoleRef(replacement_rs, replacement_rs.all_role_ref.size, :role => role_ref.role, :play => role_play)
+              raise "Internal error in #{constraint_desc}: making illegal reference to variable, joined_role mismatch" if joined_role.object_type != variable.object_type
+              @constellation.RoleRef(rs, 1, :role => joined_role)
+              join_play = @constellation.Play(:step => step, :variable => variable, :role => joined_role)
+              trace :query, "New step #{step.describe}"
+            end
+          else
+            trace :query, "Need step for non-join_over role #{end_point.name} #{role_ref.describe} in #{role_ref.role.fact_type.default_reading}"
+            if (roles = role_ref.role.fact_type.all_role.to_a).size > 1
+              # Here we have an end join (step already created) but no sequence join
+              if variable
+                raise "Internal error in #{constraint_desc}: making illegal step" if role_ref.role.object_type != role_node.object_type
+                step = @constellation.Step(:guid => :new, :fact_type => role_ref.role.fact_type)
+                join_play = @constellation.Play(:step => step, :variable => variable, :role => query_role, :is_input => true)
+                role_play = @constellation.Play(:step => step, :variable => role_node, :role => role_ref.role)
+                # Make the projected RoleRef:
+                rr = @constellation.RoleRef(replacement_rs, replacement_rs.all_role_ref.size, :role => role_ref.role, :play => role_play)
+                roles -= [query_role, role_ref.role]
+                roles.each do |incidental_role|
+                  jn = @constellation.Variable(query, query.all_variable.size, :object_type => incidental_role.object_type)
+                  play = @constellation.Play(:step => step, :variable => jn, :role => incidental_role)
+                end
+              else
 
-		if role_sequence.all_role_ref.size > 1
-		  variable = role_node
-		  query_role = role_ref.role
+                if role_sequence.all_role_ref.size > 1
+                  variable = role_node
+                  query_role = role_ref.role
 
-		  # Make the projected RoleRef:
-		  return role_sequence unless constrained_play	# REVISIT: This is a fail; survive it.
-		  rr = @constellation.RoleRef(replacement_rs, replacement_rs.all_role_ref.size, :role => constrained_play.role, :play => constrained_play)
-		else
-		  # We enter this fact type (requiring that a role be played) but don't exit it.
+                  # Make the projected RoleRef:
+                  return role_sequence unless constrained_play  # REVISIT: This is a fail; survive it.
+                  rr = @constellation.RoleRef(replacement_rs, replacement_rs.all_role_ref.size, :role => constrained_play.role, :play => constrained_play)
+                else
+                  # We enter this fact type (requiring that a role be played) but don't exit it.
                   # I think this can only happen where we have subtyping steps, above.
 
-		  # There's no query in this role sequence, so we'd drop off the bottom without doing the right things. Why?
-		  # Without this case, Supervision.orm omits "that runs Company" from the exclusion constraint, and I'm not sure why.
-		  # I think the "then" code causes it to drop out the bottom without making the step (which is otherwise made in every case, see CompanyDirectorEmployee for example)
-		  step = @constellation.Step(:guid => :new, :fact_type => role_ref.role.fact_type)
+                  # There's no query in this role sequence, so we'd drop off the bottom without doing the right things. Why?
+                  # Without this case, Supervision.orm omits "that runs Company" from the exclusion constraint, and I'm not sure why.
+                  # I think the "then" code causes it to drop out the bottom without making the step (which is otherwise made in every case, see CompanyDirectorEmployee for example)
+                  step = @constellation.Step(:guid => :new, :fact_type => role_ref.role.fact_type)
 
-		  # p constrained_play.role.object_type.name
-		  # p projecting_play.role.object_type.name
-		  # debugger
+                  # p constrained_play.role.object_type.name
+                  # p projecting_play.role.object_type.name
+                  # debugger
 
-		  role_play = @constellation.Play(:step => step, :variable => role_node, :role => role_ref.role, :is_input => true)
+                  role_play = @constellation.Play(:step => step, :variable => role_node, :role => role_ref.role, :is_input => true)
 
-		  # Make the projected RoleRef:
-		  rr = @constellation.RoleRef(replacement_rs, replacement_rs.all_role_ref.size, :role => constrained_play.role, :play => constrained_play)
+                  # Make the projected RoleRef:
+                  rr = @constellation.RoleRef(replacement_rs, replacement_rs.all_role_ref.size, :role => constrained_play.role, :play => constrained_play)
 
-#		  role_ref.role.fact_type.all_role.each do |role|
-#		    next if role == role_play.role
-#		    next if role_sequence.all_role_ref.detect{|rr| rr.role == role}
-#		    jn = @constellation.Variable(query, query.all_variable.size, :object_type => role.object_type)
-#		    play = @constellation.Play(:step => step, :variable => jn, :role => role)
-#		    if role == role_ref.role
-#		      # Make the projected RoleRef:
-#		      rr = @constellation.RoleRef(replacement_rs, replacement_rs.all_role_ref.size, :role => role, :play => play)
-#		    end
-#		  end
+#                 role_ref.role.fact_type.all_role.each do |role|
+#                   next if role == role_play.role
+#                   next if role_sequence.all_role_ref.detect{|rr| rr.role == role}
+#                   jn = @constellation.Variable(query, query.all_variable.size, :object_type => role.object_type)
+#                   play = @constellation.Play(:step => step, :variable => jn, :role => role)
+#                   if role == role_ref.role
+#                     # Make the projected RoleRef:
+#                     rr = @constellation.RoleRef(replacement_rs, replacement_rs.all_role_ref.size, :role => role, :play => play)
+#                   end
+#                 end
 
-		end
-	      end
-	    else
-	      # Unary fact type, make a Step from and to the constrained_play
-	      step = @constellation.Step(:guid => :new, :fact_type => role_ref.role.fact_type)
-	      play = @constellation.Play(:step => step, :variable => constrained_play.variable, :role => role_ref.role, :is_input => true)
-	      # Make the projected RoleRef:
-	      rr = @constellation.RoleRef(replacement_rs, replacement_rs.all_role_ref.size, :role => role_ref.role, :play => play)
-	    end
-	  end
-	end
-	raise "hell" if replacement_rs.all_role_ref.size != role_sequence.all_role_ref.size
+                end
+              end
+            else
+              # Unary fact type, make a Step from and to the constrained_play
+              step = @constellation.Step(:guid => :new, :fact_type => role_ref.role.fact_type)
+              play = @constellation.Play(:step => step, :variable => constrained_play.variable, :role => role_ref.role, :is_input => true)
+              # Make the projected RoleRef:
+              rr = @constellation.RoleRef(replacement_rs, replacement_rs.all_role_ref.size, :role => role_ref.role, :play => play)
+            end
+          end
+        end
+        raise "hell" if replacement_rs.all_role_ref.size != role_sequence.all_role_ref.size
 
-	# Thoroughly check that this is a valid query
-	query.validate
-	trace :query, "Query has projected nodes #{replacement_rs.describe}"
-	replacement_rs 
+        # Thoroughly check that this is a valid query
+        query.validate
+        trace :query, "Query has projected nodes #{replacement_rs.describe}"
+        replacement_rs 
       end
 
       # Equality and subset join constraints involve two or more role sequences,
@@ -1020,6 +1020,7 @@ module ActiveFacts
       #
       def make_queries(constraint_type, name, role_sequences)
         begin
+          constraint_desc = "#{constraint_type} #{name}"
           # Get the object types constrained for each position in the role sequences.
           # Supertyping steps may be needed to reach them.
           end_points = []   # An array of the common supertype for matching role_refs across the sequences
@@ -1028,10 +1029,10 @@ module ActiveFacts
             role_refs = role_sequences.map{|rs| rs.all_role_ref.detect{|rr| rr.ordinal == i}}
             if (fact_types = role_refs.map{|rr| rr.role.fact_type}).uniq.size == 1
               # $stderr.puts(role_sequences.map{|rs| rs.all_role_ref.map{|rr| rr.role.fact_type.describe(rr.role)}}.inspect)
-              raise "In #{constraint_type} #{name} role sequence #{i}, there is a faulty join involving just 1 fact type: '#{fact_types[0].default_reading}'"
+              raise "In #{constraint_desc} role sequence #{i}, there is a faulty join involving just 1 fact type: '#{fact_types[0].default_reading}'"
             end
             if (players = role_refs.map{|rr| rr.role.object_type}).uniq.size == 1
-	      # All roles in this set are played by the same object type
+              # All roles in this set are played by the same object type
               end_point = players[0]
               end_step_needed[i] = false
             else
@@ -1042,7 +1043,7 @@ module ActiveFacts
                 end
               end_point = common_supertypes[0]
 
-              raise "constrained roles of #{constraint_type} #{name} are incompatible (#{players.map(&:name)*', '})" if common_supertypes.size == 0
+              raise "constrained roles of #{constraint_desc} are incompatible (#{players.map(&:name)*', '})" if common_supertypes.size == 0
               end_step_needed[i] = true
             end
             end_points[i] = end_point
@@ -1065,10 +1066,10 @@ module ActiveFacts
             return true
           end
 
-          trace :query, "#{constraint_type} join constraint #{name} over #{role_sequences.map{|rs|rs.describe}*', '}"
+          trace :query, "#{constraint_desc} over #{role_sequences.map{|rs|rs.describe}*', '}"
 
           query = nil
-          trace :query, "#{constraint_type} join constraint #{name} constrains #{
+          trace :query, "#{constraint_desc} constrains #{
               end_points.zip(end_step_needed).map{|(p,j)| (p ? p.name : 'NULL')+(j ? ' & subtypes':'')}*', '
             }#{
             if role_sequences[0].all_role_ref.size > 1
@@ -1084,12 +1085,12 @@ module ActiveFacts
 
             # There may be one query per role sequence:
             role_sequences.zip(sequence_join_over||[], sequence_joined_roles||[]).map do |role_sequence, join_over, joined_roles|
-	      position = role_sequences.index(role_sequence)
-	      replacement_rs = query_over_role_sequence(role_sequence, join_over, joined_roles, end_points)
-	      if role_sequence != replacement_rs
-		role_sequences[position] = replacement_rs
-	      end
-	    end
+              position = role_sequences.index(role_sequence)
+              replacement_rs = query_over_role_sequence(constraint_desc, role_sequence, join_over, joined_roles, end_points)
+              if role_sequence != replacement_rs
+                role_sequences[position] = replacement_rs
+              end
+            end
 
             return true
           end
@@ -1125,15 +1126,15 @@ module ActiveFacts
               @mandatory_constraints_by_rs.delete(mc_rs)
             end
 
-	    if role_sequences.compact.size != role_sequences.size  # Role sequence missing; includes a derived fact type role
-	      trace :orm, "skipped exclusion constraint #{id}, missing role sequence"
-	      next
-	    end
+            if role_sequences.compact.size != role_sequences.size  # Role sequence missing; includes a derived fact type role
+              trace :orm, "skipped exclusion constraint #{id}, missing role sequence"
+              next
+            end
 
-	    unless make_queries('exclusion', name+(x_mandatory ? '/'+x_mandatory['Name'] : ''), role_sequences)
-	      trace :orm, "skipped exclusion constraint #{id}, can't make_queries"
-	      next
-	    end
+            unless make_queries('exclusion', name+(x_mandatory ? '/'+x_mandatory['Name'] : ''), role_sequences)
+              trace :orm, "skipped exclusion constraint #{id}, can't make_queries"
+              next
+            end
 
             ec = @constellation.SetExclusionConstraint(id_of(x))
             ec.vocabulary = @vocabulary
@@ -1327,7 +1328,7 @@ module ActiveFacts
           end
 
           # The EntityType instances have implicit facts for the PI facts.
-	  # These are in the ORM file, but instead of using those,
+          # These are in the ORM file, but instead of using those,
           # We create implicit PI facts after all the instances.
           entity_count = 0
           pi_fact_count = 0
@@ -1378,7 +1379,7 @@ module ActiveFacts
           # Use the "ref" attribute of FactTypeRoleInstance:
           x_fact_roles = @x_model.xpath("orm:Facts/orm:Fact/orm:Instances/orm:FactTypeInstance/orm:RoleInstances/orm:FactTypeRoleInstance")
 
-	  # REVISIT: This presumably duplicates the identifying fact instances for the above entities. Hmmm.
+          # REVISIT: This presumably duplicates the identifying fact instances for the above entities. Hmmm.
           last_id = nil
           fact = nil
           fact_roles = []
@@ -1450,7 +1451,7 @@ module ActiveFacts
                   location = convert_location(bounds, Gravity::C)
                   # $stderr.puts "#{subject.name}: bounds=#{bounds} -> location = (#{location.x}, #{location.y})"
                   shape = @constellation.ObjectTypeShape(
-                      :guid => id_of(x_shape), :orm_diagram => diagram, :location => location, :is_expanded => is_expanded,
+                      :guid => id_of(x_shape), :orm_diagram => diagram, :is_expanded => is_expanded,
                       :object_type => subject,
                       :location => location
                     )
@@ -1523,12 +1524,12 @@ module ActiveFacts
           when 'ObjectifiedFactTypeNameShape'
             @constellation.ObjectifiedFactTypeNameShape(:guid => id_of(xr_shape), :fact_type_shape => shape, :orm_diagram => diagram, :location => location, :is_expanded => false)
           when 'ReadingShape'
-	    begin
+            begin
             @constellation.ReadingShape(:guid => id_of(xr_shape), :fact_type_shape => shape, :orm_diagram => diagram, :location => location, :is_expanded => false, :reading => fact_type.preferred_reading)
-	    rescue =>e
-	      debugger
-	      @constellation.ReadingShape(:guid => id_of(xr_shape), :fact_type_shape => shape, :orm_diagram => diagram, :location => location, :is_expanded => false, :reading => fact_type.preferred_reading)
-	    end
+            rescue =>e
+              debugger
+              @constellation.ReadingShape(:guid => id_of(xr_shape), :fact_type_shape => shape, :orm_diagram => diagram, :location => location, :is_expanded => false, :reading => fact_type.preferred_reading)
+            end
           when 'RoleNameShape'
             role = @by_id[xr_shape.xpath("ormDiagram:Subject")[0]['ref']]
             role_display = role_display_for_role(shape, x_role_display, role)
