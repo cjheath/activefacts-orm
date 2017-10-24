@@ -836,7 +836,7 @@ module ActiveFacts
           @constellation.Variable(query, query.all_variable.size, :object_type => ti.subtype)
         supertype_node = query.all_variable.detect{|jn| jn.object_type == ti.supertype } ||
           @constellation.Variable(query, query.all_variable.size, :object_type => ti.supertype)
-        step = @constellation.Step(:guid => :new, :fact_type => ti)
+        step = @constellation.Step(:query => query, :ordinal => query.all_step.size, :fact_type => ti)
         rs = @constellation.RoleSequence(:new)
         @constellation.RoleRef(rs, 0, :role => ti.subtype_role)
         sub_play = @constellation.Play(:step => step, :variable => subtype_node, :role => ti.subtype_role)
@@ -928,7 +928,7 @@ module ActiveFacts
               rs = @constellation.RoleSequence(:new)
               # Detect the fact type over which we're stepping (may involve objectification)
               raise "Internal error in #{constraint_desc}: making illegal reference to variable, object type mismatch" if role_ref.role.object_type != role_node.object_type
-              step = @constellation.Step(:guid => :new, :fact_type => joined_role.fact_type)
+              step = @constellation.Step(:query => query, :ordinal => query.all_step.size, :fact_type => joined_role.fact_type)
               @constellation.RoleRef(rs, 0, :role => role_ref.role)
               role_play = @constellation.Play(:step => step, :variable => role_node, :role => role_ref.role, :is_input => true)
               # Make the projected RoleRef:
@@ -944,7 +944,7 @@ module ActiveFacts
               # Here we have an end join (step already created) but no sequence join
               if variable
                 raise "Internal error in #{constraint_desc}: making illegal step" if role_ref.role.object_type != role_node.object_type
-                step = @constellation.Step(:guid => :new, :fact_type => role_ref.role.fact_type)
+                step = @constellation.Step(:query => query, :ordinal => query.all_step.size, :fact_type => role_ref.role.fact_type)
                 join_play = @constellation.Play(:step => step, :variable => variable, :role => query_role, :is_input => true)
                 role_play = @constellation.Play(:step => step, :variable => role_node, :role => role_ref.role)
                 # Make the projected RoleRef:
@@ -970,7 +970,7 @@ module ActiveFacts
                   # There's no query in this role sequence, so we'd drop off the bottom without doing the right things. Why?
                   # Without this case, Supervision.orm omits "that runs Company" from the exclusion constraint, and I'm not sure why.
                   # I think the "then" code causes it to drop out the bottom without making the step (which is otherwise made in every case, see CompanyDirectorEmployee for example)
-                  step = @constellation.Step(:guid => :new, :fact_type => role_ref.role.fact_type)
+                  step = @constellation.Step(:query => query, :ordinal => query.all_step.size, :fact_type => role_ref.role.fact_type)
 
                   # p constrained_play.role.object_type.name
                   # p projecting_play.role.object_type.name
@@ -996,7 +996,7 @@ module ActiveFacts
               end
             else
               # Unary fact type, make a Step from and to the constrained_play
-              step = @constellation.Step(:guid => :new, :fact_type => role_ref.role.fact_type)
+              step = @constellation.Step(:query => query, :ordinal => query.all_step.size, :fact_type => role_ref.role.fact_type)
               play = @constellation.Play(:step => step, :variable => constrained_play.variable, :role => role_ref.role, :is_input => true)
               # Make the projected RoleRef:
               rr = @constellation.RoleRef(replacement_rs, replacement_rs.all_role_ref.size, :role => role_ref.role, :play => play)
