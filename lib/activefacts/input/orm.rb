@@ -551,13 +551,15 @@ module ActiveFacts
           text.gsub!(role_with_adjectives_re) {
             # REVISIT: Don't want to strip all spaces here any more:
             #puts "text=#{text.inspect}, la=#{$1.inspect}, ta=#{$2.inspect}" if $1 || $2
-            la = ($1||'').gsub(/\s+/,' ') # Strip duplicate spaces
-            ta = ($2||'').gsub(/\s+/,' ')
+            la = ($1||'')
+            ta = ($2||'')
+            la.gsub!(/\s+/,' ') # Strip duplicate spaces
+            ta.gsub!(/\s+/,' ')
             # When we have "aaa-bbb" we want "aaa bbb"
             # When we have "aaa- bbb" we want "aaa bbb"
             # When we have "aaa-- bbb" we want "aaa-bbb"
-            la = la.sub(/(-)?- ?/,'\1').strip
-            ta = ta.sub(/ ?(-)?-/,'\1').strip
+            la = la.sub(/-- +/,'-').sub(/-( |$)/,' ').strip
+            ta = ta.sub(/ *--/,'-').sub(/(^| )-/,' ').strip
             #puts "Setting leading adj #{la.inspect} from #{text.inspect} for #{role_ref.role.object_type.name}" if la != ""
             # REVISIT: Dunno what's up here, but removing the "if" test makes this chuck exceptions:
             role_ref.leading_adjective = la if la != ""
