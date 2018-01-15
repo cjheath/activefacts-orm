@@ -24,5 +24,5 @@ Install the Natural ORM Architect from http://ormfoundation.org to produce input
   spec.add_development_dependency "rspec", "~> 3.3"
 
   spec.add_runtime_dependency "activefacts-metamodel", ">= 1.8", "~> 1"
-  spec.add_runtime_dependency "nokogiri", ">= 1.6", "~> 1.6.6.2"
+  spec.add_runtime_dependency "nokogiri", ">= 1.6", "~> 1"
 end
