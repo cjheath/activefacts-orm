@@ -521,11 +521,16 @@ module ActiveFacts
                 #   # REVISIT: rr.leading_adjective = ...; Add adjectives here
                 #  }
 
+                if x_readings.empty?
+                  raise "#{fact_type.describe} has no readings"
+                end
                 x_readings.each_with_index{|x, i|
                   reading = @constellation.Reading(fact_type, fact_type.all_reading.size, :is_negative => false)
                   reading.role_sequence = role_sequence
                   # REVISIT: The downcase here only needs to be the initial letter of each word, but be safe:
-                  reading.text = extract_adjectives(x.text, role_sequence)
+                  text = extract_adjectives(x.text, role_sequence)
+                  raise "#{fact_type.describe} has an empty reading #{x.text}" if text.empty?
+                  reading.text = text
                 }
               }
             end
@@ -578,7 +583,7 @@ module ActiveFacts
           case w
           when /[A-Za-z]/
             if RESERVED_WORDS.include?(w)
-              $stderr.puts "Masking reserved word '#{w}' in reading '#{text}' with players #{all_role_refs.map(&:role).map(&:name).inspect}"
+              $stderr.puts "Masking reserved word '#{w}' in reading '#{text}' with players #{all_role_refs.map(&:role).map(&:object_type).map(&:name).inspect}"
               next "_#{w}"
             elsif @constellation.ObjectType[[[@vocabulary.name], w]]
               $stderr.puts "Masking object type name '#{w}' in reading '#{text}'"
