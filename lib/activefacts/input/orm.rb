@@ -1102,7 +1102,7 @@ module ActiveFacts
             return true
           end
         rescue => e
-          debugger if trace :debug
+          debugger if trace :debug_uc
           $stderr.puts "// #{e.to_s}: #{e.backtrace[0]}"
           return false
         end
@@ -1260,6 +1260,9 @@ module ActiveFacts
             max_frequency = x_frequency_constraint["MaxFrequency"].to_i
             max_frequency = nil if max_frequency == 0
             x_roles = x_frequency_constraint.xpath("orm:RoleSequence/orm:Role")
+            unless x_roles[0]
+              raise "#{x_frequency_constraint['Name']} covers no roles!"
+            end
             role = @by_id[x_roles[0]["ref"]]
             role_sequence = @constellation.RoleSequence(:new)
             role_ref = @constellation.RoleRef(role_sequence, 0, :role => role)
