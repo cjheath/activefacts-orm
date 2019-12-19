@@ -1595,7 +1595,7 @@ module ActiveFacts
 
       # Detect numeric data and denote it as a string:
       def is_literal_string(value)
-        value =~ /[^ \d.]/
+        value !~ /^\s*(\.\d+|\d+[.\d]*)\s*$/
       end
 
       def read_rest
